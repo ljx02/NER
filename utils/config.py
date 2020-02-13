@@ -15,14 +15,14 @@ class Config(object):
 
 # 数据处理
 class ConfigProcess(Config):
-    # 训练集路径
-    trainData_path = ''
-    # 测试集路径
-    testData_path = ''
+    # 数据集路径
+    corpus_path = ''
     # 字典存储路径
     vocab_path = ''
     # 维度
     embedding_dim = 1
+    # 词频阀值
+    min_count = 1
 
     def _init_(self, class_name, file_path):
         # 类名
@@ -32,10 +32,9 @@ class ConfigProcess(Config):
     def load_config(self):
         config = configparser.ConfigParser()
         config.read(self.file_path, encoding='UTF-8')
-        self.trainData_path = config.get(self.class_name, 'trainData_path')
-        self.testData_path = config.get(self.class_name, 'testData_path')
+        self.corpus_path = config.get(self.class_name, 'corpus_path')
         self.vocab_path = config.get(self.class_name, 'vocab_path')
-        self.embedding_dim = config.get(self.class_name, 'embedding_dim')
+        self.embedding_dim = config.getint(self.class_name, 'embedding_dim')
 
 
 # 训练
@@ -85,16 +84,16 @@ class ConfigTrain(Config):
         self.store_path = config.get(self.class_name, 'store_path')
         self.trainData_path = config.get(self.class_name, 'trainData_path')
         self.testData_path = config.get(self.class_name, 'testData_path')
-        self.shuffle = config.get(self.class_name, 'shuffle')
-        self.batch_size = config.get(self.class_name, 'batch_size')
-        self.epoch = config.get(self.class_name, 'epoch')
-        self.lr = config.get(self.class_name, 'lr')
-        self.clip = config.get(self.class_name, 'clip')
+        self.shuffle = config.getboolean(self.class_name, 'shuffle')
+        self.batch_size = config.getint(self.class_name, 'batch_size')
+        self.epoch = config.getint(self.class_name, 'epoch')
+        self.lr = config.getfloat(self.class_name, 'lr')
+        self.clip = config.getfloat(self.class_name, 'clip')
         self.optimizer = config.get(self.class_name, 'optimizer')
-        self.dropout = config.get(self.class_name, 'dropout')
-        self.embedding_dim = config.get(self.class_name, 'embedding_dim')
-        self.update_embedding = config.get(self.class_name, 'update_embedding')
-        self.hidden_dim = config.get(self.class_name, 'hidden_dim')
+        self.dropout = config.getfloat(self.class_name, 'dropout')
+        self.embedding_dim = config.getint(self.class_name, 'embedding_dim')
+        self.update_embedding = config.getboolean(self.class_name, 'update_embedding')
+        self.hidden_dim = config.getint(self.class_name, 'hidden_dim')
         self.summary_path = config.get(self.class_name, 'summary_path')
         self.vocab_path = config.get(self.class_name, 'vocab_path')
         self.result_path = config.get(self.class_name, 'result_path')
@@ -120,6 +119,8 @@ class ConfigPredict(Config):
     summary_path = ''
     # 优化器
     optimizer = ''
+    # 每次预测句子数
+    batch_size = 1
 
     def _init_(self, class_name, file_path):
         # 类名
@@ -133,13 +134,13 @@ class ConfigPredict(Config):
         self.model_path = config.get(self.class_name, 'model_path')
         self.vocab_path = config.get(self.class_name, 'vocab_path')
         self.demo_model = config.get(self.class_name, 'demo_model')
-        self.embedding_dim = config.get(self.class_name, 'embedding_dim')
-        self.update_embedding = config.get(self.class_name, 'update_embedding')
-        self.hidden_dim = config.get(self.class_name, 'hidden_dim')
-        self.clip = config.get(self.class_name, 'clip')
+        self.embedding_dim = config.getint(self.class_name, 'embedding_dim')
+        self.update_embedding = config.getboolean(self.class_name, 'update_embedding')
+        self.hidden_dim = config.getint(self.class_name, 'hidden_dim')
+        self.clip = config.getfloat(self.class_name, 'clip')
         self.summary_path = config.get(self.class_name, 'summary_path')
         self.optimizer = config.get(self.class_name, 'optimizer')
-
+        self.batch_size = config.getint(self.class_name, 'batch_size')
 
 def get_logger(filename):
     logger = logging.getLogger('logger')

@@ -39,7 +39,7 @@ parser.add_argument('--pretrain_embedding', type=str, default='random',
 parser.add_argument('--embedding_dim', type=int, default=params.embedding_dim, help='random init char embedding_dim')
 parser.add_argument('--shuffle', type=train_utils.str2bool, default=params.shuffle,
                     help='shuffle training data before each epoch')
-parser.add_argument('--mode', type=str, default='train', help='train/test/demo')
+parser.add_argument('--mode', type=str, default='test', help='train/test/demo')
 parser.add_argument('--demo_model', type=str, default='1521112368', help='model for test and demo')
 args = parser.parse_args()
 
@@ -54,15 +54,11 @@ train_data = read_corpus(args.train_data)
 test_data = read_corpus(args.test_data)
 logger = cf.get_logger('logs/1.txt')
 
-# 模型加载
-# model = BiLSTM_CRF(embeddings, args.update_embedding, args.hidden_dim, num_tags, args.clip, summary_path,
-#                    args.optimizer)
-# model.build_graph()
-
 
 def run_one_epoch(model, sess, train_corpus, dev, tag_label, epoch, saver):
     """
     训练模型，训练一个批次
+    :param model: 模型
     :param sess: 训练模型的一次会话
     :param train_corpus: 训练数据
     :param dev: 用来验证的数据
@@ -84,13 +80,13 @@ def run_one_epoch(model, sess, train_corpus, dev, tag_label, epoch, saver):
         _, loss_train, summary, step_num_ = sess.run([model.train_op, model.loss, model.merged, model.global_step],
                                                      feed_dict=feed_dict)
 
-        if step + 1 == 1 or (step + 1) % 20 == 0 or step + 1 == num_batches:
+        if step + 1 == 1 or (step + 1) % args.batch_size == 0 or step + 1 == num_batches:
             print('logger info')
             logger.info('{} epoch {}, step {}, loss: {:.4}, total_step: {}'.format(start_time, epoch + 1, step + 1,
                                                                                    loss_train, step_num))
 
         if step + 1 == num_batches:
-            saver.sace(sess, model_path, global_step=step_num)
+            saver.save(sess, model_path, global_step=step_num)
 
     logger.info('=============test==============')
     label_list_dev, seq_len_list_dev = dev_one_epoch(model, sess, dev)
@@ -113,6 +109,10 @@ def evaluate(label_list, data, epoch=None):
     for label_, (sent, tag) in zip(label_list, data):
         tag_ = [label2tag[label__] for label__ in label_]
         sent_res = []
+        if len(label_) != len(sent):
+            print(sent)
+            print(len(label_))
+            print(tag)
         for i in range(len(sent)):
             sent_res.append([sent[i], tag[i], tag_[i]])
         model_predict.append(sent_res)
@@ -126,6 +126,7 @@ def evaluate(label_list, data, epoch=None):
 def dev_one_epoch(model, sess, dev):
     """
 
+    :param model: 运行的模型
     :param sess: 训练的一次会话
     :param dev: 验证数据
     :return:
@@ -137,7 +138,7 @@ def dev_one_epoch(model, sess, dev):
         log_its, transition_params = sess.run([model.log_its, model.transition_params],
                                               feed_dict=feed_dict)
         label_list_ = []
-        for log_it, seq_len in zip(log_its, seq_len_list):
+        for log_it, seq_len in zip(log_its, seq_len_list_):
             vtb_seq, _ = viterbi_decode(log_it[:seq_len], transition_params)
             label_list_.append(vtb_seq)
 
@@ -152,11 +153,14 @@ def test(data, file):
     :param data:测试数据
     :param file:模型
     """
+    model = BiLSTM_CRF(embeddings, args.update_embedding, args.hidden_dim, num_tags, args.clip, summary_path,
+                       args.optimizer)
+    model.build_graph()
     testsaver = tf.train.Saver()
     with tf.Session(config=config) as sess:
         testsaver.restore(sess, file)
-        label_list, seq_len_list = dev_one_epoch(sess, data)
-        evaluate(label_list, seq_len_list, data)
+        label_list, seq_len_list = dev_one_epoch(model, sess, data)
+        evaluate(label_list, data)
 
 
 def train(train_corpus, test_corpus):
@@ -188,7 +192,6 @@ def run(operation):
     :return:
     """
     if operation == 'train':
-        # tf.reset_default_graph()
         train(train_data, test_data)
 
     if operation == 'test':
