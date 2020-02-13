@@ -93,7 +93,7 @@ def run_one_epoch(model, sess, train_corpus, dev, tag_label, epoch, saver):
             saver.sace(sess, model_path, global_step=step_num)
 
     logger.info('=============test==============')
-    label_list_dev, seq_len_list_dev = dev_one_epoch(sess, dev)
+    label_list_dev, seq_len_list_dev = dev_one_epoch(model, sess, dev)
     evaluate(label_list_dev, dev, epoch)
 
 
