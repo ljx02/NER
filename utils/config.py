@@ -1,8 +1,11 @@
 import configparser
 import logging
 
-
 class Config(object):
+    """
+    配置类
+    params:log_path：日志存储路径
+    """
     log_path = ''
 
     def __init__(self, class_name, file_path):
@@ -10,6 +13,10 @@ class Config(object):
         self.file_path = file_path
 
     def load_config(self):
+        """
+        加载
+        :return:
+        """
         pass
 
 
@@ -21,8 +28,6 @@ class ConfigProcess(Config):
     vocab_path = ''
     # 维度
     embedding_dim = 1
-    # 词频阀值
-    min_count = 1
 
     def _init_(self, class_name, file_path):
         # 类名
@@ -30,6 +35,10 @@ class ConfigProcess(Config):
         self.file_path = file_path
 
     def load_config(self):
+        """
+        加载数据预处理参数
+        :return:
+        """
         config = configparser.ConfigParser()
         config.read(self.file_path, encoding='UTF-8')
         self.corpus_path = config.get(self.class_name, 'corpus_path')
@@ -77,8 +86,11 @@ class ConfigTrain(Config):
         self.class_name = class_name
         self.file_path = file_path
 
-    # 从配置文件中读取参数
     def load_config(self):
+        """
+        加载训练参数
+        :return:
+        """
         config = configparser.ConfigParser()
         config.read(self.file_path, encoding='UTF-8')  # 修改encoding='UTF-8',ljx02
         self.store_path = config.get(self.class_name, 'store_path')
@@ -105,12 +117,10 @@ class ConfigPredict(Config):
     model_path = ''
     # 字典路径
     vocab_path = ''
-    # 模型名
-    demo_model = ''
     # 维度
     embedding_dim = 1
     # 是否更新
-    update_embedding = 300
+    update_embedding = True
     # 隐藏层维度
     hidden_dim = 300
     # 梯度裁剪
@@ -127,13 +137,15 @@ class ConfigPredict(Config):
         self.class_name = class_name
         self.file_path = file_path
 
-    # 从配置文件中读取参数
     def load_config(self):
+        """
+        加载预测参数
+        :return:
+        """
         config = configparser.ConfigParser()
         config.read(self.file_path, encoding='UTF-8')
         self.model_path = config.get(self.class_name, 'model_path')
         self.vocab_path = config.get(self.class_name, 'vocab_path')
-        self.demo_model = config.get(self.class_name, 'demo_model')
         self.embedding_dim = config.getint(self.class_name, 'embedding_dim')
         self.update_embedding = config.getboolean(self.class_name, 'update_embedding')
         self.hidden_dim = config.getint(self.class_name, 'hidden_dim')
@@ -143,6 +155,10 @@ class ConfigPredict(Config):
         self.batch_size = config.getint(self.class_name, 'batch_size')
 
 def get_logger(filename):
+    """
+    :param filename:  文件名
+    :return:
+    """
     logger = logging.getLogger('logger')
     logger.setLevel(logging.DEBUG)
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
