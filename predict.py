@@ -4,10 +4,13 @@ from tensorflow.contrib.crf import viterbi_decode
 
 from model import BiLSTM_CRF
 from utils import train_utils
-from data_process import tag2label, read_dictionary
+from data_process import read_dictionary
 import utils.config as cf
 
+
 # 参数部分
+params = cf.ConfigPredict('predict', 'config/params.conf')
+params.load_config()
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.3
@@ -15,6 +18,7 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.3
 
 def predict_one_batch(model, ses, seqs):
     """
+    Created by jty
     预测引擎，输入句子id和保存好的模型参数进行预测，输出标签id
     :param ses: 使用会话
     :param seqs: 句子id
@@ -33,8 +37,9 @@ def predict_one_batch(model, ses, seqs):
     return label_list, seq_len_list
 
 
-def demo_one(model, ses, sent, batch_size, vocab, shuffle):
+def demo_one(model, ses, sent, batch_size, vocab, shuffle, tag2label):
     """
+    Created by jty
     输入句子，得到预测标签id，并转化为label
     :param model: 保存好的模型
     :param ses: 使用会话
@@ -58,6 +63,7 @@ def demo_one(model, ses, sent, batch_size, vocab, shuffle):
 
 
 """
+Created by jty
 数据后处理
 根据输入的tag和句子返回对应的字符
 其中包括抽取出对应的人名、地名、组织名
@@ -143,8 +149,9 @@ def get_ORG_entity(tag_seq, char_seq):
     return ORG
 
 
-def predict(model, batch_size, vocab, shuffle=False):
+def predict(model, batch_size, vocab, tag2label, shuffle=False):
     """
+    Created by jty
     预测模块总函数。
     输入：保存好的模型、每次预测的句子数、word2id字典、交互界面输入的需要实体抽取的句子
     输出：实体抽取的结果
@@ -168,20 +175,18 @@ def predict(model, batch_size, vocab, shuffle=False):
             else:
                 demo_sent = list(demo_sent.strip())
                 demo_data = [(demo_sent, ['O'] * len(demo_sent))]
-                tag = demo_one(model, sess, demo_data, batch_size, vocab, shuffle)
+                tag = demo_one(model, sess, demo_data, batch_size, vocab, shuffle, tag2label)
                 PER, LOC, ORG = get_entity(tag, demo_sent)
                 print('PER: {}\nLOC: {}\nORG: {}'.format(PER, LOC, ORG))
 
 
-if __name__ == '__main__':
-    params = cf.ConfigPredict('predict', 'config/params.conf')
-    params.load_config()
+def run():
     embedding_mat = np.random.uniform(-0.25, 0.25, (len(read_dictionary(params.vocab_path)), params.embedding_dim))
     embedding_mat = np.float32(embedding_mat)
     embeddings = embedding_mat
-    num_tags = len(tag2label)
+    num_tags = len(params.tag2label)
     summary_path = "logs"
     model = BiLSTM_CRF(embeddings, params.update_embedding, params.hidden_dim, num_tags, params.clip, summary_path,
                        params.optimizer)
     model.build_graph()
-    predict(model, params.batch_size, read_dictionary(params.vocab_path))
+    predict(model, params.batch_size, read_dictionary(params.vocab_path), params.tag2label)

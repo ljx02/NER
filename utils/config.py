@@ -1,12 +1,19 @@
 import configparser
 import logging
 
+
 class Config(object):
     """
+    created by jma
     配置类
     params:log_path：日志存储路径
     """
     log_path = ''
+    tag2label = {"O": 0,
+                 "B-PER": 1, "I-PER": 2,
+                 "B-LOC": 3, "I-LOC": 4,
+                 "B-ORG": 5, "I-ORG": 6
+                 }
 
     def __init__(self, class_name, file_path):
         self.class_name = class_name
@@ -14,10 +21,13 @@ class Config(object):
 
     def load_config(self):
         """
+        created by jma
         加载
         :return:
         """
-        pass
+        config = configparser.ConfigParser()
+        config.read(self.file_path, encoding='UTF-8')
+        
 
 
 # 数据处理
@@ -36,6 +46,7 @@ class ConfigProcess(Config):
 
     def load_config(self):
         """
+        created by jma
         加载数据预处理参数
         :return:
         """
@@ -88,6 +99,7 @@ class ConfigTrain(Config):
 
     def load_config(self):
         """
+        created by jma
         加载训练参数
         :return:
         """
@@ -139,6 +151,7 @@ class ConfigPredict(Config):
 
     def load_config(self):
         """
+        created by jma
         加载预测参数
         :return:
         """
@@ -156,6 +169,7 @@ class ConfigPredict(Config):
 
 def get_logger(filename):
     """
+    created by jma
     :param filename:  文件名
     :return:
     """
