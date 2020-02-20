@@ -17,6 +17,66 @@ def total(corpus_path, vocab_path, embedding_dim):
     get_embedding_mat = random_embedding(get_word2id, embedding_dim)
     return get_embedding_mat
 
+def data_clean(corpus_path, clean_path):
+    """
+    Created by jty
+    输入train_data文件的路径，读取训练集的语料，输出train_data
+    read corpus and return the list of samples
+    :param：corpus_path
+    :return: data
+    """
+    with open(corpus_path, encoding='utf-8') as fw:
+        with open(clean_path, 'w', encoding='utf-8') as fwn:
+            lines = fw.readlines()
+            for line in lines:
+                if line != '\n':
+                    char, label = line.strip().split()
+                    if label == 'B-PER.NAM' or label == 'B-PER.NOM':
+                        label = 'B-PER'
+                    if label == 'I-PER.NAM' or label == 'I-PER.NOM':
+                        label = 'I-PER'
+                    if label == 'B-ORG.NAM' or label == 'B-ORG.NOM':
+                        label = 'B-ORG'
+                    if label == 'I-ORG.NAM' or label == 'I-ORG.NOM':
+                        label = 'I-ORG'
+                    if label == 'B-LOC.NAM' or label == 'B-LOC.NOM' or label == 'B-GPE.NAM':
+                        label = 'B-LOC'
+                    if label == 'I-LOC.NAM' or label == 'I-LOC.NOM' or label == 'I-GPE.NAM':
+                        label = 'I-LOC'
+                    fwn.write(char + ' ' + label + '\n')
+                else:
+                    fwn.write("\n")
+    '''
+    per1 = 0
+    per2 = 0
+    loc1 = 0
+    loc2 = 0
+    org1 = 0
+    org2 = 0
+    org3 = 0
+    sentence_count = 0
+    with open(corpus_path, encoding='utf-8') as fr:
+        lines = fr.readlines()
+    for line in lines:
+        if line.find("B-PER.NOM") > -1:
+            per1 = per1 + 1
+        if line.find("B-PER.NAM") > -1:
+            per2 = per2 + 1
+        if line.find("B-LOC.NOM") > -1:
+            loc1 = loc1 + 1
+        if line.find("B-LOC.NAM") > -1:
+            loc2 = loc2 + 1
+        if line.find("B-GPE.NAM") > -1:
+            org1 = org1 + 1
+        if line.find("B-ORG.NOM") > -1:
+            org2 = org2 + 1
+        if line.find("B-ORG.NAM") > -1:
+            org3 = org3 + 1
+        if line == '\n':
+            sentence_count = sentence_count + 1
+    return per1, per2, loc1, loc2, org1, org2, org3, sentence_count
+    '''
+
 
 def read_corpus(corpus_path):
     """
@@ -127,6 +187,7 @@ def random_embedding(vocab, embedding_dim):
     return embedding_mat
 
 
+data_clean('data/weibo_dev.txt', 'data/weibo_clean_dev.txt')
 if __name__ == '__main__':
     params = cf.ConfigProcess('process', 'config/params.conf')
     params.load_config()
