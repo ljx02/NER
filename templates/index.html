@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>CH_NER</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css')}}">
+<!--    <script type="text/javascript" src="{{ url_for('static', filename='js/predict.js') }}"></script>-->
+    <style type="text/css">
+        body{
+            background-image: url("../static/pictures/bk.jpg");
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="text-center mt-5" >
+        <h1 style="color:black">CH_NER</h1>
+        <p style="color:black ">在线命名实体识别</p>
+        <textarea style="border-style:none;opacity: 0.6;padding:30px 30px 0px 30px" id="input" rows="8" cols="115" placeholder="输入中文句子" spellcheck="false"></textarea>
+        <div id="contentwordage"></div>
+    </div>
+
+</div>
+<div class="container" >
+    <div class="text-center">
+<!--        <button id="predict" class="btn btn-lg p-2 m-2" onclick="predict()" >提交</button>-->
+        <button id="clear" class="btn btn-lg p-2 m-2" onclick="clean()">清除</button>
+    </div>
+</div>
+<div class="container">
+    <div class="text-center">
+        <textarea style="border-style:none;opacity: 0.6" id="output" rows="8" cols="115" placeholder="输出中文实体">
+        </textarea>
+<!--        <div class="result_box" onclick="changeColor(this)">-->
+<!--            <div class="result_text" onclick="changeColor(this)">北京</div>-->
+<!--        </div>-->
+<!--        <div id="adddiv" style="background-color:white" class="text-center">-->
+
+<!--        </div>-->
+    </div>
+</div>
+</body>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/predict.js') }}"></script>
+</html>
+
+

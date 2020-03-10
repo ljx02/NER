@@ -1,0 +1,32 @@
+.result_box{
+    background-color:ghostwhite;
+    border-color:ghostwhite;
+    display:inline-block;
+    padding:10px 10px 10px 10px;
+    max-weight:30px;
+    margin:3px 3px 3px 3px;
+    cursor:pointer;
+}
+.result_show{
+    background-color:blue;
+    border-color:blue;
+    display:inline-block;
+    padding:10px 10px 10px 10px;
+    max-weight:30px;
+    margin:3px 3px 3px 3px;
+    cursor:pointer;
+}
+.result_text{
+    height:auto;
+    text-align:center;
+    max-width:280px;
+    font-size:14px;
+    padding:3px 3px 3px 3px;
+}
+.result_text_show{
+    height:auto;
+    text-align:center;
+    max-width:280px;
+    font-size:14px;
+    padding:3px 3px 3px 3px;
+}
